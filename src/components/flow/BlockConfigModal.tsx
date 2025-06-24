@@ -31,7 +31,7 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
     onSave(node.id, config);
   };
 
-  const renderConfigFields = () => {
+  const renderConfigFields = (): React.ReactNode => {
     switch (node.type) {
       case 'if':
         return (
