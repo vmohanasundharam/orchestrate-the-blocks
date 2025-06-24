@@ -54,8 +54,8 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
                 <SelectContent>
                   <SelectItem value="equals">=</SelectItem>
                   <SelectItem value="not_equals">!=</SelectItem>
-                  <SelectItem value="greater_than">></SelectItem>
-                  <SelectItem value="less_than"><</SelectItem>
+                  <SelectItem value="greater_than">&gt;</SelectItem>
+                  <SelectItem value="less_than">&lt;</SelectItem>
                   <SelectItem value="contains">contains</SelectItem>
                 </SelectContent>
               </Select>
