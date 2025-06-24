@@ -196,7 +196,7 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
         );
       
       default:
-        return <p>No configuration available for this block type.</p>;
+        return <div>No configuration available for this block type.</div>;
     }
   };
 
