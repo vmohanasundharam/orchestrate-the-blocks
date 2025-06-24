@@ -1,12 +1,50 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from 'react';
+import { FlowList } from '@/components/flow/FlowList';
+import { FlowBuilder } from '@/components/flow/FlowBuilder';
+
+export interface Flow {
+  id: string;
+  name: string;
+  description: string;
+  triggerType: 'datasource' | 'schedule' | 'webhook';
+  triggerConfig: any;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const Index = () => {
+  const [currentView, setCurrentView] = useState<'list' | 'builder'>('list');
+  const [selectedFlow, setSelectedFlow] = useState<Flow | null>(null);
+
+  const handleCreateFlow = (flow: Flow) => {
+    setSelectedFlow(flow);
+    setCurrentView('builder');
+  };
+
+  const handleEditFlow = (flow: Flow) => {
+    setSelectedFlow(flow);
+    setCurrentView('builder');
+  };
+
+  const handleBackToList = () => {
+    setCurrentView('list');
+    setSelectedFlow(null);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      {currentView === 'list' ? (
+        <FlowList 
+          onCreateFlow={handleCreateFlow}
+          onEditFlow={handleEditFlow}
+        />
+      ) : (
+        <FlowBuilder 
+          flow={selectedFlow}
+          onBack={handleBackToList}
+        />
+      )}
     </div>
   );
 };
