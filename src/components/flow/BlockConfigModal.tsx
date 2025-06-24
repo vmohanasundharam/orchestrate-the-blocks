@@ -19,14 +19,14 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
   node,
   onSave,
 }) => {
-  const [config, setConfig] = useState(node.data?.config || {});
+  const [config, setConfig] = useState<Record<string, any>>(node.data?.config || {});
 
   const handleSave = () => {
     onSave(node.id, config);
   };
 
   const updateConfig = (key: string, value: any) => {
-    setConfig((prev: any) => ({ ...prev, [key]: value }));
+    setConfig((prev: Record<string, any>) => ({ ...prev, [key]: value }));
   };
 
   const renderConfigFields = (): React.ReactNode => {

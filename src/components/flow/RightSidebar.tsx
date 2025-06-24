@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { settings, Code } from 'lucide-react';
+import { Settings, Code } from 'lucide-react';
 import { GlobalVariablesModal } from './GlobalVariablesModal';
 import { JavaScriptFunctionsModal } from './JavaScriptFunctionsModal';
 
@@ -23,7 +23,7 @@ export const RightSidebar: React.FC = () => {
                   className="w-full justify-center"
                   onClick={() => setIsVariablesModalOpen(true)}
                 >
-                  <settings className="w-4 h-4" />
+                  <Settings className="w-4 h-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
