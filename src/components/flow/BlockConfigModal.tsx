@@ -1,12 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { Node } from '@xyflow/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Node } from '@xyflow/react';
 
 interface BlockConfigModalProps {
   isOpen: boolean;
@@ -21,14 +19,14 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
   node,
   onSave,
 }) => {
-  const [config, setConfig] = useState<any>({});
-
-  useEffect(() => {
-    setConfig(node.data?.config || {});
-  }, [node]);
+  const [config, setConfig] = useState(node.data?.config || {});
 
   const handleSave = () => {
     onSave(node.id, config);
+  };
+
+  const updateConfig = (key: string, value: any) => {
+    setConfig((prev: any) => ({ ...prev, [key]: value }));
   };
 
   const renderConfigFields = (): React.ReactNode => {
@@ -37,167 +35,116 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
         return (
           <div className="space-y-4">
             <div>
-              <Label htmlFor="condition">Condition</Label>
+              <label className="block text-sm font-medium mb-2">Condition</label>
               <Input
-                id="condition"
                 value={config.condition || ''}
-                onChange={(e) => setConfig({ ...config, condition: e.target.value })}
-                placeholder="e.g., data.value > 100"
+                onChange={(e) => updateConfig('condition', e.target.value)}
+                placeholder="Enter condition..."
               />
-            </div>
-            <div>
-              <Label htmlFor="operator">Operator</Label>
-              <Select value={config.operator || ''} onValueChange={(value) => setConfig({ ...config, operator: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select operator" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="equals">=</SelectItem>
-                  <SelectItem value="not_equals">!=</SelectItem>
-                  <SelectItem value="greater_than">&gt;</SelectItem>
-                  <SelectItem value="less_than">&lt;</SelectItem>
-                  <SelectItem value="contains">contains</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
         );
-      
       case 'switch':
         return (
           <div className="space-y-4">
             <div>
-              <Label htmlFor="variable">Switch Variable</Label>
+              <label className="block text-sm font-medium mb-2">Switch Expression</label>
               <Input
-                id="variable"
-                value={config.variable || ''}
-                onChange={(e) => setConfig({ ...config, variable: e.target.value })}
-                placeholder="e.g., data.status"
-              />
-            </div>
-            <div>
-              <Label htmlFor="cases">Cases (JSON format)</Label>
-              <Textarea
-                id="cases"
-                value={config.cases || ''}
-                onChange={(e) => setConfig({ ...config, cases: e.target.value })}
-                placeholder='{"case1": "action1", "case2": "action2"}'
-                rows={4}
+                value={config.expression || ''}
+                onChange={(e) => updateConfig('expression', e.target.value)}
+                placeholder="Enter expression..."
               />
             </div>
           </div>
         );
-      
       case 'loop':
         return (
           <div className="space-y-4">
             <div>
-              <Label htmlFor="loopType">Loop Type</Label>
-              <Select value={config.loopType || ''} onValueChange={(value) => setConfig({ ...config, loopType: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select loop type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="for">For Loop</SelectItem>
-                  <SelectItem value="while">While Loop</SelectItem>
-                  <SelectItem value="foreach">For Each</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className="block text-sm font-medium mb-2">Loop Type</label>
+              <select
+                value={config.type || 'for'}
+                onChange={(e) => updateConfig('type', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="for">For Loop</option>
+                <option value="while">While Loop</option>
+                <option value="foreach">For Each</option>
+              </select>
             </div>
             <div>
-              <Label htmlFor="iterations">Max Iterations</Label>
+              <label className="block text-sm font-medium mb-2">Condition</label>
               <Input
-                id="iterations"
-                type="number"
-                value={config.iterations || ''}
-                onChange={(e) => setConfig({ ...config, iterations: e.target.value })}
-                placeholder="100"
+                value={config.condition || ''}
+                onChange={(e) => updateConfig('condition', e.target.value)}
+                placeholder="Enter loop condition..."
               />
             </div>
           </div>
         );
-      
       case 'database':
         return (
           <div className="space-y-4">
             <div>
-              <Label htmlFor="operation">Database Operation</Label>
-              <Select value={config.operation || ''} onValueChange={(value) => setConfig({ ...config, operation: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select operation" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="select">SELECT</SelectItem>
-                  <SelectItem value="insert">INSERT</SelectItem>
-                  <SelectItem value="update">UPDATE</SelectItem>
-                  <SelectItem value="delete">DELETE</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="table">Table Name</Label>
-              <Input
-                id="table"
-                value={config.table || ''}
-                onChange={(e) => setConfig({ ...config, table: e.target.value })}
-                placeholder="table_name"
+              <label className="block text-sm font-medium mb-2">Query</label>
+              <Textarea
+                value={config.query || ''}
+                onChange={(e) => updateConfig('query', e.target.value)}
+                placeholder="Enter SQL query..."
+                rows={4}
               />
             </div>
             <div>
-              <Label htmlFor="query">SQL Query</Label>
-              <Textarea
-                id="query"
-                value={config.query || ''}
-                onChange={(e) => setConfig({ ...config, query: e.target.value })}
-                placeholder="SELECT * FROM table_name WHERE condition"
-                rows={3}
+              <label className="block text-sm font-medium mb-2">Database Connection</label>
+              <Input
+                value={config.connection || ''}
+                onChange={(e) => updateConfig('connection', e.target.value)}
+                placeholder="Database connection string..."
               />
             </div>
           </div>
         );
-      
       case 'redis':
         return (
           <div className="space-y-4">
             <div>
-              <Label htmlFor="redisOperation">Redis Operation</Label>
-              <Select value={config.operation || ''} onValueChange={(value) => setConfig({ ...config, operation: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select operation" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="get">GET</SelectItem>
-                  <SelectItem value="set">SET</SelectItem>
-                  <SelectItem value="del">DELETE</SelectItem>
-                  <SelectItem value="exists">EXISTS</SelectItem>
-                  <SelectItem value="expire">EXPIRE</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className="block text-sm font-medium mb-2">Operation</label>
+              <select
+                value={config.operation || 'get'}
+                onChange={(e) => updateConfig('operation', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="get">GET</option>
+                <option value="set">SET</option>
+                <option value="del">DELETE</option>
+                <option value="exists">EXISTS</option>
+              </select>
             </div>
             <div>
-              <Label htmlFor="key">Key</Label>
+              <label className="block text-sm font-medium mb-2">Key</label>
               <Input
-                id="key"
                 value={config.key || ''}
-                onChange={(e) => setConfig({ ...config, key: e.target.value })}
-                placeholder="cache_key"
+                onChange={(e) => updateConfig('key', e.target.value)}
+                placeholder="Redis key..."
               />
             </div>
-            <div>
-              <Label htmlFor="value">Value (for SET operation)</Label>
-              <Input
-                id="value"
-                value={config.value || ''}
-                onChange={(e) => setConfig({ ...config, value: e.target.value })}
-                placeholder="cache_value"
-              />
-            </div>
+            {config.operation === 'set' && (
+              <div>
+                <label className="block text-sm font-medium mb-2">Value</label>
+                <Input
+                  value={config.value || ''}
+                  onChange={(e) => updateConfig('value', e.target.value)}
+                  placeholder="Redis value..."
+                />
+              </div>
+            )}
           </div>
         );
-      
       default:
         return (
-          <div>No configuration available for this block type.</div>
+          <div>
+            <p className="text-gray-500">No configuration options available for this block type.</p>
+          </div>
         );
     }
   };
@@ -206,11 +153,9 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg m-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl m-4">
         <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold">
-            Configure {node.data?.label || 'Block'}
-          </h2>
+          <h2 className="text-xl font-semibold">Configure {node.type} Block</h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>
@@ -224,7 +169,7 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={handleSave}>
             Save Configuration
           </Button>
         </div>

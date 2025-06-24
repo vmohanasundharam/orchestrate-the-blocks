@@ -1,52 +1,63 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { settings, Code } from 'lucide-react';
 import { GlobalVariablesModal } from './GlobalVariablesModal';
+import { JavaScriptFunctionsModal } from './JavaScriptFunctionsModal';
 
 export const RightSidebar: React.FC = () => {
   const [isVariablesModalOpen, setIsVariablesModalOpen] = useState(false);
+  const [isFunctionsModalOpen, setIsFunctionsModalOpen] = useState(false);
 
   return (
     <>
       <div className="w-64 bg-white border-l border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <h3 className="font-semibold text-gray-900">Flow Settings</h3>
-        </div>
-        
         <div className="p-4 space-y-2">
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2"
-            onClick={() => setIsVariablesModalOpen(true)}
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-            Global Variables
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-center"
+                  onClick={() => setIsVariablesModalOpen(true)}
+                >
+                  <settings className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Global Variables</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-center"
+                  onClick={() => setIsFunctionsModalOpen(true)}
+                >
+                  <Code className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>JavaScript Functions</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 
       <GlobalVariablesModal
         isOpen={isVariablesModalOpen}
         onClose={() => setIsVariablesModalOpen(false)}
+      />
+
+      <JavaScriptFunctionsModal
+        isOpen={isFunctionsModalOpen}
+        onClose={() => setIsFunctionsModalOpen(false)}
       />
     </>
   );
