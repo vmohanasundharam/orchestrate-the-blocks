@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { 
   ReactFlow, 
@@ -19,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Flow } from '@/pages/Index';
 import { BlockSidebar } from './BlockSidebar';
 import { BlockConfigModal } from './BlockConfigModal';
+import { RightSidebar } from './RightSidebar';
 import { IfNode } from './nodes/IfNode';
 import { SwitchNode } from './nodes/SwitchNode';
 import { LoopNode } from './nodes/LoopNode';
@@ -137,24 +137,27 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ flow, onBack }) => {
           </div>
         </div>
 
-        <div className="flex-1">
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onNodeClick={onNodeClick}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            nodeTypes={nodeTypes}
-            fitView
-            className="bg-gray-50"
-          >
-            <Controls />
-            <MiniMap />
-            <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-          </ReactFlow>
+        <div className="flex-1 flex">
+          <div className="flex-1">
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onNodeClick={onNodeClick}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              nodeTypes={nodeTypes}
+              fitView
+              className="bg-gray-50"
+            >
+              <Controls />
+              <MiniMap />
+              <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+            </ReactFlow>
+          </div>
+          <RightSidebar />
         </div>
       </div>
 
