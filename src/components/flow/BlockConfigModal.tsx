@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Node } from '@xyflow/react';
+import { JavaScriptBlockConfig } from './JavaScriptBlockConfig';
 
 interface BlockConfigModalProps {
   isOpen: boolean;
@@ -31,6 +31,8 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
 
   const renderConfigFields = (): React.ReactNode => {
     switch (node.type) {
+      case 'javascript':
+        return <JavaScriptBlockConfig config={config} updateConfig={updateConfig} />;
       case 'if':
         return (
           <div className="space-y-4">

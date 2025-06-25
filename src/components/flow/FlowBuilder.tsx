@@ -24,6 +24,7 @@ import { SwitchNode } from './nodes/SwitchNode';
 import { LoopNode } from './nodes/LoopNode';
 import { DatabaseNode } from './nodes/DatabaseNode';
 import { RedisNode } from './nodes/RedisNode';
+import { JavaScriptNode } from './nodes/JavaScriptNode';
 
 const nodeTypes = {
   if: IfNode,
@@ -31,6 +32,7 @@ const nodeTypes = {
   loop: LoopNode,
   database: DatabaseNode,
   redis: RedisNode,
+  javascript: JavaScriptNode,
 };
 
 const initialNodes: Node[] = [

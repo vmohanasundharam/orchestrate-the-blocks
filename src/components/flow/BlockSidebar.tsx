@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { GitBranch, ToggleLeft, RotateCcw, Database, Zap } from 'lucide-react';
+import { GitBranch, ToggleLeft, RotateCcw, Database, Zap, Code } from 'lucide-react';
 
 const blocks = [
   {
@@ -37,6 +37,13 @@ const blocks = [
     icon: Zap,
     description: 'Redis cache operations',
     color: 'bg-red-500',
+  },
+  {
+    type: 'javascript',
+    label: 'JavaScript',
+    icon: Code,
+    description: 'Execute JavaScript function',
+    color: 'bg-indigo-500',
   },
 ];
 
