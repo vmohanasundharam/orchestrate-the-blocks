@@ -112,7 +112,8 @@ export const JavaScriptBlockConfig: React.FC<JavaScriptBlockConfigProps> = ({
 
   const handleSuggestionSelect = (suggestion: Variable | Tag) => {
     const currentValue = inputRefs.current[showSuggestions.inputKey]?.value || '';
-    const newValue = currentValue + (showSuggestions.type === 'variables' ? `#${suggestion.name || (suggestion as Tag).key}` : `#${(suggestion as Tag).key}`);
+    const suggestionName = 'name' in suggestion ? suggestion.name : suggestion.key;
+    const newValue = currentValue + `#${suggestionName}`;
     
     if (showSuggestions.inputKey === 'returnVariable') {
       updateConfig('returnVariable', newValue);
