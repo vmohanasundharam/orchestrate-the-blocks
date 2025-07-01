@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Node } from '@xyflow/react';
 import { JavaScriptBlockConfig } from './JavaScriptBlockConfig';
+import { TagVariableInput } from './TagVariableInput';
+import { useGlobalVariables } from '@/contexts/GlobalVariablesContext';
 
 interface BlockConfigModalProps {
   isOpen: boolean;
@@ -21,8 +23,20 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
   onSave,
 }) => {
   const [config, setConfig] = useState<Record<string, any>>(node.data?.config || {});
+  const { addVariable } = useGlobalVariables();
 
   const handleSave = () => {
+    // Auto-create global variables for certain fields
+    if (node.type === 'redis' && (config.operation === 'get' || config.operation === 'exists')) {
+      if (config.resultMapping && !config.resultMapping.startsWith('#')) {
+        addVariable({
+          name: config.resultMapping,
+          value: '',
+          type: 'String'
+        });
+      }
+    }
+
     onSave(node.id, config);
     onClose();
   };
@@ -35,66 +49,60 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
     switch (node.type) {
       case 'javascript':
         return <JavaScriptBlockConfig config={config} updateConfig={updateConfig} onSave={handleSave} />;
+      
       case 'if':
         return (
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Condition</label>
-              <Input
+              <TagVariableInput
                 value={config.condition || ''}
-                onChange={(e) => updateConfig('condition', e.target.value)}
-                placeholder="Enter condition..."
+                onChange={(value) => updateConfig('condition', value)}
+                placeholder="Enter condition... (Press # for variables/tags)"
               />
             </div>
           </div>
         );
+      
       case 'loop':
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Loop Type</label>
-              <select
-                value={config.type || 'for'}
-                onChange={(e) => updateConfig('type', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              >
-                <option value="for">For Loop</option>
-                <option value="while">While Loop</option>
-                <option value="foreach">For Each</option>
-              </select>
+              <label className="block text-sm font-medium mb-2">Condition</label>
+              <TagVariableInput
+                value={config.condition || ''}
+                onChange={(value) => updateConfig('condition', value)}
+                placeholder="Enter loop condition... (Press # for variables/tags)"
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Condition</label>
-              <Input
-                value={config.condition || ''}
-                onChange={(e) => updateConfig('condition', e.target.value)}
-                placeholder="Enter loop condition..."
-              />
+              <label className="block text-sm font-medium mb-2">Execution Mode</label>
+              <select
+                value={config.executionMode || 'checkThenExecute'}
+                onChange={(e) => updateConfig('executionMode', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="checkThenExecute">Check then Execute</option>
+                <option value="executeThenCheck">Execute then Check</option>
+              </select>
             </div>
           </div>
         );
+      
       case 'database':
         return (
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Query</label>
-              <Textarea
+              <TagVariableInput
                 value={config.query || ''}
-                onChange={(e) => updateConfig('query', e.target.value)}
-                placeholder="Enter SQL query..."
-                rows={4}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Database Connection</label>
-              <Input
-                value={config.connection || ''}
-                onChange={(e) => updateConfig('connection', e.target.value)}
-                placeholder="Database connection string..."
+                onChange={(value) => updateConfig('query', value)}
+                placeholder="Enter SQL query... (Press # for variables/tags)"
               />
             </div>
           </div>
         );
+      
       case 'redis':
         return (
           <div className="space-y-4">
@@ -113,24 +121,35 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Key</label>
-              <Input
+              <TagVariableInput
                 value={config.key || ''}
-                onChange={(e) => updateConfig('key', e.target.value)}
-                placeholder="Redis key..."
+                onChange={(value) => updateConfig('key', value)}
+                placeholder="Redis key... (Press # for variables/tags)"
               />
             </div>
             {config.operation === 'set' && (
               <div>
                 <label className="block text-sm font-medium mb-2">Value</label>
-                <Input
+                <TagVariableInput
                   value={config.value || ''}
-                  onChange={(e) => updateConfig('value', e.target.value)}
-                  placeholder="Redis value..."
+                  onChange={(value) => updateConfig('value', value)}
+                  placeholder="Redis value... (Press # for variables/tags)"
+                />
+              </div>
+            )}
+            {(config.operation === 'get' || config.operation === 'exists') && (
+              <div>
+                <label className="block text-sm font-medium mb-2">Result Mapping</label>
+                <TagVariableInput
+                  value={config.resultMapping || ''}
+                  onChange={(value) => updateConfig('resultMapping', value)}
+                  placeholder="Variable to store result... (Press # for existing variables)"
                 />
               </div>
             )}
           </div>
         );
+      
       default:
         return (
           <div>

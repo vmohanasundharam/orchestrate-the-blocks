@@ -17,6 +17,11 @@ export const RedisNode = memo(({ data }: { data: any }) => {
           {data.config.operation}
         </div>
       )}
+      {data.config?.resultMapping && (
+        <div className="text-xs text-gray-500 mt-1 truncate">
+          → {data.config.resultMapping}
+        </div>
+      )}
       
       <Handle type="target" position={Position.Top} className="w-3 h-3" />
       <Handle type="source" position={Position.Bottom} className="w-3 h-3" />

@@ -12,9 +12,14 @@ export const LoopNode = memo(({ data }: { data: any }) => {
         </div>
         <div className="text-sm font-medium">Loop</div>
       </div>
-      {data.config?.loopType && (
-        <div className="text-xs text-gray-600 mt-1 capitalize">
-          {data.config.loopType} loop
+      {data.config?.condition && (
+        <div className="text-xs text-gray-600 mt-1 truncate">
+          {data.config.condition}
+        </div>
+      )}
+      {data.config?.executionMode && (
+        <div className="text-xs text-gray-500 mt-1">
+          {data.config.executionMode === 'checkThenExecute' ? 'Check → Execute' : 'Execute → Check'}
         </div>
       )}
       

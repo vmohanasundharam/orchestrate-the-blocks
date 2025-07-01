@@ -12,9 +12,9 @@ export const DatabaseNode = memo(({ data }: { data: any }) => {
         </div>
         <div className="text-sm font-medium">Database</div>
       </div>
-      {data.config?.operation && (
-        <div className="text-xs text-gray-600 mt-1 uppercase">
-          {data.config.operation}
+      {data.config?.query && (
+        <div className="text-xs text-gray-600 mt-1 truncate">
+          Query defined
         </div>
       )}
       
