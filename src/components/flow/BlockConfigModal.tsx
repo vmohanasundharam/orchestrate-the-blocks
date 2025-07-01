@@ -24,6 +24,7 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
 
   const handleSave = () => {
     onSave(node.id, config);
+    onClose();
   };
 
   const updateConfig = (key: string, value: any) => {
@@ -33,7 +34,7 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
   const renderConfigFields = (): React.ReactNode => {
     switch (node.type) {
       case 'javascript':
-        return <JavaScriptBlockConfig config={config} updateConfig={updateConfig} />;
+        return <JavaScriptBlockConfig config={config} updateConfig={updateConfig} onSave={handleSave} />;
       case 'if':
         return (
           <div className="space-y-4">
@@ -155,14 +156,16 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
           {renderConfigFields()}
         </div>
 
-        <div className="flex justify-end gap-3 p-6 border-t">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>
-            Save Configuration
-          </Button>
-        </div>
+        {node.type !== 'javascript' && (
+          <div className="flex justify-end gap-3 p-6 border-t">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave}>
+              Save Configuration
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

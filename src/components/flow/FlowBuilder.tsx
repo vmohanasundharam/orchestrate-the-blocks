@@ -1,49 +1,40 @@
-import React, { useState, useCallback } from 'react';
-import { 
-  ReactFlow, 
-  MiniMap, 
-  Controls, 
-  Background, 
-  useNodesState, 
-  useEdgesState, 
+
+import React, { useState, useCallback, useEffect } from 'react';
+import {
+  ReactFlow,
   addEdge,
+  MiniMap,
+  Controls,
+  Background,
+  useNodesState,
+  useEdgesState,
   Connection,
   Edge,
   Node,
-  BackgroundVariant
+  BackgroundVariant,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, Save, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Flow } from '@/pages/Index';
 import { BlockSidebar } from './BlockSidebar';
 import { BlockConfigModal } from './BlockConfigModal';
 import { FlowControlCenter } from './FlowControlCenter';
+import { JavaScriptNode } from './nodes/JavaScriptNode';
 import { IfNode } from './nodes/IfNode';
 import { LoopNode } from './nodes/LoopNode';
 import { DatabaseNode } from './nodes/DatabaseNode';
 import { RedisNode } from './nodes/RedisNode';
-import { JavaScriptNode } from './nodes/JavaScriptNode';
+import { Flow } from '@/pages/Index';
+import { useFlow } from '@/contexts/FlowContext';
+import { useToast } from '@/hooks/use-toast';
 
 const nodeTypes = {
+  javascript: JavaScriptNode,
   if: IfNode,
   loop: LoopNode,
   database: DatabaseNode,
   redis: RedisNode,
-  javascript: JavaScriptNode,
 };
-
-const initialNodes: Node[] = [
-  {
-    id: 'start',
-    type: 'input',
-    position: { x: 250, y: 25 },
-    data: { label: 'Start' },
-    style: { background: '#10B981', color: 'white', border: 'none' },
-  },
-];
-
-const initialEdges: Edge[] = [];
 
 interface FlowBuilderProps {
   flow: Flow | null;
@@ -51,22 +42,83 @@ interface FlowBuilderProps {
 }
 
 export const FlowBuilder: React.FC<FlowBuilderProps> = ({ flow, onBack }) => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const { saveFlow, saveDraft, getDraft } = useFlow();
+  const { toast } = useToast();
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
 
-  const onConnect = useCallback(
-    (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
-
-  const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
-    if (node.type !== 'input' && node.type !== 'output') {
-      setSelectedNode(node);
-      setIsConfigModalOpen(true);
+  // Load draft or existing flow data
+  useEffect(() => {
+    if (flow) {
+      // Check for draft first
+      const draft = getDraft(flow.id);
+      if (draft && draft.nodes) {
+        setNodes(draft.nodes || []);
+        setEdges(draft.edges || []);
+        toast({
+          title: "Draft loaded",
+          description: "Loaded unsaved changes from draft",
+        });
+      } else if (flow.nodes) {
+        setNodes(flow.nodes || []);
+        setEdges(flow.edges || []);
+      }
     }
+  }, [flow, getDraft, setNodes, setEdges, toast]);
+
+  const onConnect = useCallback((params: Connection | Edge) => {
+    setEdges((eds) => addEdge(params, eds));
+  }, [setEdges]);
+
+  const handleNodeDoubleClick = useCallback((event: React.MouseEvent, node: Node) => {
+    setSelectedNode(node);
+    setIsConfigModalOpen(true);
   }, []);
+
+  const handleSaveConfiguration = (nodeId: string, config: any) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, config } }
+          : node
+      )
+    );
+    setIsConfigModalOpen(false);
+  };
+
+  const handleSaveFlow = () => {
+    if (flow) {
+      const updatedFlow = {
+        ...flow,
+        nodes,
+        edges,
+        updatedAt: new Date(),
+      };
+      saveFlow(updatedFlow);
+      toast({
+        title: "Flow saved",
+        description: "Your flow has been saved successfully",
+      });
+    }
+  };
+
+  const handleSaveDraft = () => {
+    if (flow) {
+      const draftFlow = {
+        ...flow,
+        nodes,
+        edges,
+        updatedAt: new Date(),
+      };
+      saveDraft(draftFlow);
+      toast({
+        title: "Draft saved",
+        description: "Your changes have been saved as draft",
+      });
+    }
+  };
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -91,7 +143,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ flow, onBack }) => {
         id: `${type}-${Date.now()}`,
         type,
         position,
-        data: { label: `${type.charAt(0).toUpperCase() + type.slice(1)} Block` },
+        data: { label: `${type} node` },
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -99,24 +151,12 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ flow, onBack }) => {
     [setNodes]
   );
 
-  const handleConfigSave = (nodeId: string, config: any) => {
-    setNodes((nds) =>
-      nds.map((node) =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, config } }
-          : node
-      )
-    );
-    setIsConfigModalOpen(false);
-    setSelectedNode(null);
-  };
-
   return (
-    <div className="flex h-screen">
+    <div className="h-screen flex bg-gray-50">
       <BlockSidebar />
       
-      <div className="flex-1 flex flex-col relative">
-        <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
+      <div className="flex-1 flex flex-col">
+        <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={onBack}>
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -124,15 +164,17 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ flow, onBack }) => {
             </Button>
             <div>
               <h1 className="text-xl font-semibold">{flow?.name || 'Untitled Flow'}</h1>
-              <p className="text-gray-600 text-sm">{flow?.description}</p>
+              <p className="text-sm text-gray-600">{flow?.description}</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button variant="outline" onClick={handleSaveDraft}>
+              <FileText className="w-4 h-4 mr-2" />
               Save Draft
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              Deploy Flow
+            <Button onClick={handleSaveFlow}>
+              <Save className="w-4 h-4 mr-2" />
+              Save Flow
             </Button>
           </div>
         </div>
@@ -144,7 +186,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ flow, onBack }) => {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            onNodeClick={onNodeClick}
+            onNodeDoubleClick={handleNodeDoubleClick}
             onDrop={onDrop}
             onDragOver={onDragOver}
             nodeTypes={nodeTypes}
@@ -155,7 +197,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ flow, onBack }) => {
             <MiniMap />
             <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
           </ReactFlow>
-          
+
           <FlowControlCenter />
         </div>
       </div>
@@ -163,12 +205,9 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ flow, onBack }) => {
       {selectedNode && (
         <BlockConfigModal
           isOpen={isConfigModalOpen}
-          onClose={() => {
-            setIsConfigModalOpen(false);
-            setSelectedNode(null);
-          }}
+          onClose={() => setIsConfigModalOpen(false)}
           node={selectedNode}
-          onSave={handleConfigSave}
+          onSave={handleSaveConfiguration}
         />
       )}
     </div>

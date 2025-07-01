@@ -16,11 +16,13 @@ interface Tag {
 interface JavaScriptBlockConfigProps {
   config: Record<string, any>;
   updateConfig: (key: string, value: any) => void;
+  onSave?: () => void;
 }
 
 export const JavaScriptBlockConfig: React.FC<JavaScriptBlockConfigProps> = ({
   config,
   updateConfig,
+  onSave,
 }) => {
   const { functions: availableFunctions } = useJavaScriptFunctions();
   const { variables: globalVariables, addVariable } = useGlobalVariables();
@@ -58,20 +60,27 @@ export const JavaScriptBlockConfig: React.FC<JavaScriptBlockConfigProps> = ({
 
   const handleReturnVariableChange = (value: string) => {
     updateConfig('returnVariable', value);
-    
-    // Check if the return variable is a new global variable
-    if (value && !value.includes('#') && selectedFunction) {
-      const existingVariable = globalVariables.find(v => v.name === value);
+  };
+
+  const handleSaveConfiguration = () => {
+    // Check if the return variable is a new global variable and add it
+    const returnVar = config.returnVariable;
+    if (returnVar && !returnVar.includes('#') && selectedFunction) {
+      const existingVariable = globalVariables.find(v => v.name === returnVar);
       if (!existingVariable) {
         // Add as new global variable
         addVariable({
-          name: value,
+          name: returnVar,
           value: '',
           type: selectedFunction.returnType === 'string' ? 'String' : 
                 selectedFunction.returnType === 'number' ? 'Number' :
                 selectedFunction.returnType === 'boolean' ? 'Boolean' : 'String'
         });
       }
+    }
+    
+    if (onSave) {
+      onSave();
     }
   };
 
@@ -190,6 +199,12 @@ export const JavaScriptBlockConfig: React.FC<JavaScriptBlockConfigProps> = ({
           />
         </div>
       )}
+
+      <div className="flex justify-end">
+        <Button onClick={handleSaveConfiguration} className="bg-blue-600 hover:bg-blue-700">
+          Save Configuration
+        </Button>
+      </div>
 
       {showSuggestions.show && (
         <div

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FlowConfigModal } from './FlowConfigModal';
 import { Flow } from '@/pages/Index';
+import { useFlow } from '@/contexts/FlowContext';
 
 interface FlowListProps {
   onCreateFlow: (flow: Flow) => void;
@@ -33,36 +34,9 @@ const defaultFlows: Flow[] = [
 ];
 
 export const FlowList: React.FC<FlowListProps> = ({ onCreateFlow, onEditFlow }) => {
-  const [flows, setFlows] = useState<Flow[]>([]);
+  const { flows, saveFlow } = useFlow();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingFlow, setEditingFlow] = useState<Flow | null>(null);
-
-  // Load flows from localStorage on component mount
-  useEffect(() => {
-    const savedFlows = localStorage.getItem('flows');
-    if (savedFlows) {
-      try {
-        const parsedFlows = JSON.parse(savedFlows).map((flow: any) => ({
-          ...flow,
-          createdAt: new Date(flow.createdAt),
-          updatedAt: new Date(flow.updatedAt),
-        }));
-        setFlows(parsedFlows);
-      } catch (error) {
-        console.error('Error parsing saved flows:', error);
-        setFlows(defaultFlows);
-      }
-    } else {
-      setFlows(defaultFlows);
-    }
-  }, []);
-
-  // Save flows to localStorage whenever flows change
-  useEffect(() => {
-    if (flows.length > 0) {
-      localStorage.setItem('flows', JSON.stringify(flows));
-    }
-  }, [flows]);
 
   const handleCreateNew = () => {
     setEditingFlow(null);
@@ -81,7 +55,7 @@ export const FlowList: React.FC<FlowListProps> = ({ onCreateFlow, onEditFlow }) 
         ...flowData,
         updatedAt: new Date(),
       };
-      setFlows(flows.map(f => f.id === editingFlow.id ? updatedFlow : f));
+      saveFlow(updatedFlow);
       onEditFlow(updatedFlow);
     } else {
       const newFlow: Flow = {
@@ -90,7 +64,7 @@ export const FlowList: React.FC<FlowListProps> = ({ onCreateFlow, onEditFlow }) 
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      setFlows([...flows, newFlow]);
+      saveFlow(newFlow);
       onCreateFlow(newFlow);
     }
     setIsModalOpen(false);
@@ -104,6 +78,9 @@ export const FlowList: React.FC<FlowListProps> = ({ onCreateFlow, onEditFlow }) 
       default: return null;
     }
   };
+
+  // Use flows from context, fallback to default flows if empty
+  const displayFlows = flows.length > 0 ? flows : defaultFlows;
 
   return (
     <div className="container mx-auto px-6 py-8">
@@ -119,7 +96,7 @@ export const FlowList: React.FC<FlowListProps> = ({ onCreateFlow, onEditFlow }) 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {flows.map((flow) => (
+        {displayFlows.map((flow) => (
           <Card key={flow.id} className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start">

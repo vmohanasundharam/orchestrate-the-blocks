@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { FlowList } from '@/components/flow/FlowList';
 import { FlowBuilder } from '@/components/flow/FlowBuilder';
+import { Node, Edge } from '@xyflow/react';
 
 export interface Flow {
   id: string;
@@ -9,6 +10,8 @@ export interface Flow {
   description: string;
   triggerType: 'datasource' | 'schedule' | 'webhook';
   triggerConfig: any;
+  nodes?: Node[];
+  edges?: Edge[];
   createdAt: Date;
   updatedAt: Date;
 }
