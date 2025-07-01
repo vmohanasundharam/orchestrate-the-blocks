@@ -4,13 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useJavaScriptFunctions } from '@/contexts/JavaScriptFunctionsContext';
-
-interface Variable {
-  id: string;
-  name: string;
-  value: string;
-  type: string;
-}
+import { useGlobalVariables } from '@/contexts/GlobalVariablesContext';
 
 interface Tag {
   id: string;
@@ -29,6 +23,7 @@ export const JavaScriptBlockConfig: React.FC<JavaScriptBlockConfigProps> = ({
   updateConfig,
 }) => {
   const { functions: availableFunctions } = useJavaScriptFunctions();
+  const { variables: globalVariables, addVariable } = useGlobalVariables();
   const [showFunctionDropdown, setShowFunctionDropdown] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState<{
     show: boolean;
@@ -39,13 +34,7 @@ export const JavaScriptBlockConfig: React.FC<JavaScriptBlockConfigProps> = ({
 
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  // Mock data - in real app, these would come from context or props
-  const globalVariables: Variable[] = [
-    { id: '1', name: 'API_URL', value: 'https://api.example.com', type: 'String' },
-    { id: '2', name: 'MAX_RETRIES', value: '3', type: 'Number' },
-    { id: '3', name: 'TIMEOUT', value: '5000', type: 'Number' },
-  ];
-
+  // Mock data for tags
   const tags: Tag[] = [
     { id: '1', key: 'environment', value: 'production', type: 'String' },
     { id: '2', key: 'version', value: '1.2.3', type: 'String' },
@@ -67,6 +56,25 @@ export const JavaScriptBlockConfig: React.FC<JavaScriptBlockConfigProps> = ({
     updateConfig('arguments', { ...currentArgs, [argumentName]: value });
   };
 
+  const handleReturnVariableChange = (value: string) => {
+    updateConfig('returnVariable', value);
+    
+    // Check if the return variable is a new global variable
+    if (value && !value.includes('#') && selectedFunction) {
+      const existingVariable = globalVariables.find(v => v.name === value);
+      if (!existingVariable) {
+        // Add as new global variable
+        addVariable({
+          name: value,
+          value: '',
+          type: selectedFunction.returnType === 'string' ? 'String' : 
+                selectedFunction.returnType === 'number' ? 'Number' :
+                selectedFunction.returnType === 'boolean' ? 'Boolean' : 'String'
+        });
+      }
+    }
+  };
+
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, inputKey: string, allowTags: boolean = true) => {
     if (e.key === '#') {
       e.preventDefault();
@@ -81,7 +89,7 @@ export const JavaScriptBlockConfig: React.FC<JavaScriptBlockConfigProps> = ({
     }
   };
 
-  const handleSuggestionSelect = (suggestion: Variable | Tag) => {
+  const handleSuggestionSelect = (suggestion: typeof globalVariables[0] | Tag) => {
     const currentValue = inputRefs.current[showSuggestions.inputKey]?.value || '';
     const suggestionName = 'name' in suggestion ? suggestion.name : suggestion.key;
     const newValue = currentValue + `#${suggestionName}`;
@@ -176,7 +184,7 @@ export const JavaScriptBlockConfig: React.FC<JavaScriptBlockConfigProps> = ({
           <Input
             ref={(el) => (inputRefs.current['returnVariable'] = el)}
             value={config.returnVariable || ''}
-            onChange={(e) => updateConfig('returnVariable', e.target.value)}
+            onChange={(e) => handleReturnVariableChange(e.target.value)}
             onKeyDown={(e) => handleInputKeyDown(e, 'returnVariable', false)}
             placeholder="Enter variable name or press # for global variables"
           />

@@ -34,7 +34,7 @@ export const TagsModal: React.FC<TagsModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl m-4 h-[600px] flex flex-col">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-xl font-semibold">Tags</h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
@@ -49,36 +49,38 @@ export const TagsModal: React.FC<TagsModalProps> = ({
             </p>
           </div>
 
-          <ScrollArea className="h-[400px] border rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Key</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead>Type</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {tags.map((tag) => (
-                  <TableRow key={tag.id}>
-                    <TableCell className="font-medium">{tag.key}</TableCell>
-                    <TableCell>{tag.value}</TableCell>
-                    <TableCell>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        tag.type === 'String' ? 'bg-blue-100 text-blue-800' :
-                        tag.type === 'Number' ? 'bg-green-100 text-green-800' :
-                        tag.type === 'Boolean' ? 'bg-purple-100 text-purple-800' :
-                        tag.type === 'Array' ? 'bg-orange-100 text-orange-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {tag.type}
-                      </span>
-                    </TableCell>
+          <div className="border rounded-md" style={{ height: '400px' }}>
+            <ScrollArea className="h-full">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Key</TableHead>
+                    <TableHead>Value</TableHead>
+                    <TableHead>Type</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
+                </TableHeader>
+                <TableBody>
+                  {tags.map((tag) => (
+                    <TableRow key={tag.id}>
+                      <TableCell className="font-medium">{tag.key}</TableCell>
+                      <TableCell>{tag.value}</TableCell>
+                      <TableCell>
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          tag.type === 'String' ? 'bg-blue-100 text-blue-800' :
+                          tag.type === 'Number' ? 'bg-green-100 text-green-800' :
+                          tag.type === 'Boolean' ? 'bg-purple-100 text-purple-800' :
+                          tag.type === 'Array' ? 'bg-orange-100 text-orange-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {tag.type}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </ScrollArea>
+          </div>
         </div>
 
         <div className="flex justify-end gap-3 p-6 border-t">
