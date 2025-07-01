@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import {
   ReactFlow,
@@ -14,7 +13,7 @@ import {
   BackgroundVariant,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { ArrowLeft, Save, FileText } from 'lucide-react';
+import { ArrowLeft, Save, FileText, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BlockSidebar } from './BlockSidebar';
 import { BlockConfigModal } from './BlockConfigModal';
@@ -120,6 +119,32 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ flow, onBack }) => {
     }
   };
 
+  const handleDownloadFlow = () => {
+    if (flow) {
+      const flowData = {
+        ...flow,
+        nodes,
+        edges,
+        exportedAt: new Date().toISOString(),
+      };
+      
+      const dataStr = JSON.stringify(flowData, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const exportFileDefaultName = `${flow.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_flow.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      toast({
+        title: "Flow exported",
+        description: "Your flow has been downloaded as JSON file",
+      });
+    }
+  };
+
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
@@ -168,6 +193,10 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ flow, onBack }) => {
             </div>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={handleDownloadFlow}>
+              <Download className="w-4 h-4 mr-2" />
+              Download Flow
+            </Button>
             <Button variant="outline" onClick={handleSaveDraft}>
               <FileText className="w-4 h-4 mr-2" />
               Save Draft
