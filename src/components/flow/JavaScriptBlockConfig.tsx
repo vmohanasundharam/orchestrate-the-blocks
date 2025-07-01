@@ -3,15 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-interface JavaScriptFunction {
-  id: string;
-  name: string;
-  description?: string;
-  arguments: Array<{ name: string; type: string }>;
-  code: string;
-  returnType: string;
-}
+import { useJavaScriptFunctions } from '@/contexts/JavaScriptFunctionsContext';
 
 interface Variable {
   id: string;
@@ -36,6 +28,7 @@ export const JavaScriptBlockConfig: React.FC<JavaScriptBlockConfigProps> = ({
   config,
   updateConfig,
 }) => {
+  const { functions: availableFunctions } = useJavaScriptFunctions();
   const [showFunctionDropdown, setShowFunctionDropdown] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState<{
     show: boolean;
@@ -47,28 +40,6 @@ export const JavaScriptBlockConfig: React.FC<JavaScriptBlockConfigProps> = ({
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   // Mock data - in real app, these would come from context or props
-  const availableFunctions: JavaScriptFunction[] = [
-    {
-      id: '1',
-      name: 'validateEmail',
-      description: 'Validates email format',
-      arguments: [{ name: 'email', type: 'string' }],
-      code: 'function validateEmail(email) { return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email); }',
-      returnType: 'boolean',
-    },
-    {
-      id: '2',
-      name: 'formatCurrency',
-      description: 'Formats number as currency',
-      arguments: [
-        { name: 'amount', type: 'number' },
-        { name: 'currency', type: 'string' }
-      ],
-      code: 'function formatCurrency(amount, currency = "USD") { return new Intl.NumberFormat("en-US", { style: "currency", currency: currency }).format(amount); }',
-      returnType: 'string',
-    },
-  ];
-
   const globalVariables: Variable[] = [
     { id: '1', name: 'API_URL', value: 'https://api.example.com', type: 'String' },
     { id: '2', name: 'MAX_RETRIES', value: '3', type: 'Number' },

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { GitBranch, ToggleLeft, RotateCcw, Database, Zap, Code } from 'lucide-react';
+import { GitBranch, RotateCcw, Database, Zap, Code } from 'lucide-react';
 
 const blocks = [
   {
@@ -9,13 +9,6 @@ const blocks = [
     icon: GitBranch,
     description: 'Conditional logic block',
     color: 'bg-blue-500',
-  },
-  {
-    type: 'switch',
-    label: 'Switch',
-    icon: ToggleLeft,
-    description: 'Multiple condition switch',
-    color: 'bg-purple-500',
   },
   {
     type: 'loop',

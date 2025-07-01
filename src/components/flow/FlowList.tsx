@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Calendar, Database, Webhook } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,30 +11,58 @@ interface FlowListProps {
   onEditFlow: (flow: Flow) => void;
 }
 
+const defaultFlows: Flow[] = [
+  {
+    id: '1',
+    name: 'CNC Data Processing',
+    description: 'Process CNC machine data every 5 minutes',
+    triggerType: 'datasource',
+    triggerConfig: { source: 'CNC', polling: '*/5 * * * *' },
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: '2',
+    name: 'Daily Report Generation',
+    description: 'Generate daily reports at 6 AM',
+    triggerType: 'schedule',
+    triggerConfig: { cron: '0 6 * * *' },
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+];
+
 export const FlowList: React.FC<FlowListProps> = ({ onCreateFlow, onEditFlow }) => {
-  const [flows, setFlows] = useState<Flow[]>([
-    {
-      id: '1',
-      name: 'CNC Data Processing',
-      description: 'Process CNC machine data every 5 minutes',
-      triggerType: 'datasource',
-      triggerConfig: { source: 'CNC', polling: '*/5 * * * *' },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: '2',
-      name: 'Daily Report Generation',
-      description: 'Generate daily reports at 6 AM',
-      triggerType: 'schedule',
-      triggerConfig: { cron: '0 6 * * *' },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ]);
-  
+  const [flows, setFlows] = useState<Flow[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingFlow, setEditingFlow] = useState<Flow | null>(null);
+
+  // Load flows from localStorage on component mount
+  useEffect(() => {
+    const savedFlows = localStorage.getItem('flows');
+    if (savedFlows) {
+      try {
+        const parsedFlows = JSON.parse(savedFlows).map((flow: any) => ({
+          ...flow,
+          createdAt: new Date(flow.createdAt),
+          updatedAt: new Date(flow.updatedAt),
+        }));
+        setFlows(parsedFlows);
+      } catch (error) {
+        console.error('Error parsing saved flows:', error);
+        setFlows(defaultFlows);
+      }
+    } else {
+      setFlows(defaultFlows);
+    }
+  }, []);
+
+  // Save flows to localStorage whenever flows change
+  useEffect(() => {
+    if (flows.length > 0) {
+      localStorage.setItem('flows', JSON.stringify(flows));
+    }
+  }, [flows]);
 
   const handleCreateNew = () => {
     setEditingFlow(null);

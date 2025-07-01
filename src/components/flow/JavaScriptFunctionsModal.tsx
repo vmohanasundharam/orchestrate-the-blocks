@@ -6,20 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-interface Argument {
-  name: string;
-  type: string;
-}
-
-interface JavaScriptFunction {
-  id: string;
-  name: string;
-  description?: string;
-  arguments: Argument[];
-  code: string;
-  returnType: string;
-}
+import { useJavaScriptFunctions, Argument, JavaScriptFunction } from '@/contexts/JavaScriptFunctionsContext';
 
 interface JavaScriptFunctionsModalProps {
   isOpen: boolean;
@@ -199,28 +186,7 @@ export const JavaScriptFunctionsModal: React.FC<JavaScriptFunctionsModalProps> =
   isOpen,
   onClose,
 }) => {
-  const [functions, setFunctions] = useState<JavaScriptFunction[]>([
-    {
-      id: '1',
-      name: 'validateEmail',
-      description: 'Validates email format',
-      arguments: [{ name: 'email', type: 'string' }],
-      code: 'function validateEmail(email) {\n  const regex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n  return regex.test(email);\n}',
-      returnType: 'boolean',
-    },
-    {
-      id: '2',
-      name: 'formatCurrency',
-      description: 'Formats number as currency',
-      arguments: [
-        { name: 'amount', type: 'number' },
-        { name: 'currency', type: 'string' }
-      ],
-      code: 'function formatCurrency(amount, currency = "USD") {\n  return new Intl.NumberFormat("en-US", {\n    style: "currency",\n    currency: currency\n  }).format(amount);\n}',
-      returnType: 'string',
-    },
-  ]);
-
+  const { functions, addFunction, updateFunction, deleteFunction } = useJavaScriptFunctions();
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingFunction, setEditingFunction] = useState<JavaScriptFunction | undefined>();
 
@@ -230,17 +196,14 @@ export const JavaScriptFunctionsModal: React.FC<JavaScriptFunctionsModalProps> =
   };
 
   const handleDelete = (id: string) => {
-    setFunctions(prev => prev.filter(f => f.id !== id));
+    deleteFunction(id);
   };
 
   const handleSave = (functionData: Omit<JavaScriptFunction, 'id'>) => {
     if (editingFunction) {
-      setFunctions(prev => prev.map(f => 
-        f.id === editingFunction.id ? { ...functionData, id: editingFunction.id } : f
-      ));
+      updateFunction(editingFunction.id, functionData);
     } else {
-      const newFunction = { ...functionData, id: Date.now().toString() };
-      setFunctions(prev => [...prev, newFunction]);
+      addFunction(functionData);
     }
     setEditingFunction(undefined);
   };

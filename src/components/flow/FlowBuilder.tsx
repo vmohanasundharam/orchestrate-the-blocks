@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { 
   ReactFlow, 
@@ -21,7 +20,6 @@ import { BlockSidebar } from './BlockSidebar';
 import { BlockConfigModal } from './BlockConfigModal';
 import { FlowControlCenter } from './FlowControlCenter';
 import { IfNode } from './nodes/IfNode';
-import { SwitchNode } from './nodes/SwitchNode';
 import { LoopNode } from './nodes/LoopNode';
 import { DatabaseNode } from './nodes/DatabaseNode';
 import { RedisNode } from './nodes/RedisNode';
@@ -29,7 +27,6 @@ import { JavaScriptNode } from './nodes/JavaScriptNode';
 
 const nodeTypes = {
   if: IfNode,
-  switch: SwitchNode,
   loop: LoopNode,
   database: DatabaseNode,
   redis: RedisNode,

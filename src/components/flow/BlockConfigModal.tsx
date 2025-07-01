@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,19 +43,6 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
                 value={config.condition || ''}
                 onChange={(e) => updateConfig('condition', e.target.value)}
                 placeholder="Enter condition..."
-              />
-            </div>
-          </div>
-        );
-      case 'switch':
-        return (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Switch Expression</label>
-              <Input
-                value={config.expression || ''}
-                onChange={(e) => updateConfig('expression', e.target.value)}
-                placeholder="Enter expression..."
               />
             </div>
           </div>
