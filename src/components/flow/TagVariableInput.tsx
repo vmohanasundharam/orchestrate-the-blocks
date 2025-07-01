@@ -27,7 +27,7 @@ export const TagVariableInput: React.FC<TagVariableInputProps> = ({
 
   const allTags = [
     ...variables.map(v => ({ name: v.name, type: 'variable' })),
-    ...functions.flatMap(f => f.tags.map(tag => ({ name: tag, type: 'tag' })))
+    ...functions.map(f => ({ name: f.name, type: 'function' }))
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +109,7 @@ export const TagVariableInput: React.FC<TagVariableInputProps> = ({
                 </Button>
               ))
             ) : (
-              <div className="text-sm text-gray-500 p-2">No variables or tags available</div>
+              <div className="text-sm text-gray-500 p-2">No variables or functions available</div>
             )}
           </div>
         </PopoverContent>
