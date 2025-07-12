@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,11 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
 }) => {
   // Use node-specific config with fallback to empty object
   const [config, setConfig] = useState<Record<string, any>>(node.data?.config || {});
+
+  // Reset config when node changes
+  useEffect(() => {
+    setConfig(node.data?.config || {});
+  }, [node.id, node.data?.config]);
 
   const handleSave = () => {
     onSave(node.id, config);
