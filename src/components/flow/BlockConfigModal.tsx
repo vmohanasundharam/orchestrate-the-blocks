@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { ConditionInput } from './ConditionInput';
 import { Node } from '@xyflow/react';
 import { JavaScriptBlockConfig } from './JavaScriptBlockConfig';
 
@@ -47,9 +48,9 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Condition</label>
-              <Input
+              <ConditionInput
                 value={config.condition || ''}
-                onChange={(e) => updateConfig('condition', e.target.value)}
+                onChange={(value) => updateConfig('condition', value)}
                 placeholder="Enter condition..."
               />
             </div>
@@ -61,9 +62,9 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Condition</label>
-              <Input
+              <ConditionInput
                 value={config.condition || ''}
-                onChange={(e) => updateConfig('condition', e.target.value)}
+                onChange={(value) => updateConfig('condition', value)}
                 placeholder="Enter loop condition..."
               />
             </div>
