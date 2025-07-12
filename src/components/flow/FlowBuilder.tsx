@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import {
   ReactFlow,
@@ -164,11 +165,17 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({ flow, onBack }) => {
         y: event.clientY - 100,
       };
 
+      // Generate unique ID with timestamp and random number
+      const uniqueId = `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
       const newNode: Node = {
-        id: `${type}-${Date.now()}`,
+        id: uniqueId,
         type,
         position,
-        data: { label: `${type} node` },
+        data: { 
+          label: `${type} node`,
+          config: {} // Initialize with empty config specific to this node instance
+        },
       };
 
       setNodes((nds) => nds.concat(newNode));

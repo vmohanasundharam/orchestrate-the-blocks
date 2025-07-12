@@ -6,8 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Node } from '@xyflow/react';
 import { JavaScriptBlockConfig } from './JavaScriptBlockConfig';
-import { TagVariableInput } from './TagVariableInput';
-import { useGlobalVariables } from '@/contexts/GlobalVariablesContext';
 
 interface BlockConfigModalProps {
   isOpen: boolean;
@@ -23,20 +21,8 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
   onSave,
 }) => {
   const [config, setConfig] = useState<Record<string, any>>(node.data?.config || {});
-  const { addVariable } = useGlobalVariables();
 
   const handleSave = () => {
-    // Auto-create global variables for certain fields
-    if (node.type === 'redis' && (config.operation === 'get' || config.operation === 'exists')) {
-      if (config.resultMapping && !config.resultMapping.startsWith('#')) {
-        addVariable({
-          name: config.resultMapping,
-          value: '',
-          type: 'String'
-        });
-      }
-    }
-
     onSave(node.id, config);
     onClose();
   };
@@ -55,10 +41,10 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Condition</label>
-              <TagVariableInput
+              <Input
                 value={config.condition || ''}
-                onChange={(value) => updateConfig('condition', value)}
-                placeholder="Enter condition... (Press # for variables/tags)"
+                onChange={(e) => updateConfig('condition', e.target.value)}
+                placeholder="Enter condition..."
               />
             </div>
           </div>
@@ -69,10 +55,10 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Condition</label>
-              <TagVariableInput
+              <Input
                 value={config.condition || ''}
-                onChange={(value) => updateConfig('condition', value)}
-                placeholder="Enter loop condition... (Press # for variables/tags)"
+                onChange={(e) => updateConfig('condition', e.target.value)}
+                placeholder="Enter loop condition..."
               />
             </div>
             <div>
@@ -94,10 +80,11 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Query</label>
-              <TagVariableInput
+              <Textarea
                 value={config.query || ''}
-                onChange={(value) => updateConfig('query', value)}
-                placeholder="Enter SQL query... (Press # for variables/tags)"
+                onChange={(e) => updateConfig('query', e.target.value)}
+                placeholder="Enter SQL query..."
+                rows={4}
               />
             </div>
           </div>
@@ -121,29 +108,29 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Key</label>
-              <TagVariableInput
+              <Input
                 value={config.key || ''}
-                onChange={(value) => updateConfig('key', value)}
-                placeholder="Redis key... (Press # for variables/tags)"
+                onChange={(e) => updateConfig('key', e.target.value)}
+                placeholder="Redis key..."
               />
             </div>
             {config.operation === 'set' && (
               <div>
                 <label className="block text-sm font-medium mb-2">Value</label>
-                <TagVariableInput
+                <Input
                   value={config.value || ''}
-                  onChange={(value) => updateConfig('value', value)}
-                  placeholder="Redis value... (Press # for variables/tags)"
+                  onChange={(e) => updateConfig('value', e.target.value)}
+                  placeholder="Redis value..."
                 />
               </div>
             )}
             {(config.operation === 'get' || config.operation === 'exists') && (
               <div>
                 <label className="block text-sm font-medium mb-2">Result Mapping</label>
-                <TagVariableInput
+                <Input
                   value={config.resultMapping || ''}
-                  onChange={(value) => updateConfig('resultMapping', value)}
-                  placeholder="Variable to store result... (Press # for existing variables)"
+                  onChange={(e) => updateConfig('resultMapping', e.target.value)}
+                  placeholder="Variable to store result..."
                 />
               </div>
             )}
@@ -165,7 +152,7 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl m-4">
         <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold">Configure {node.type} Block</h2>
+          <h2 className="text-xl font-semibold">Configure {node.type} Block (ID: {node.id})</h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>
