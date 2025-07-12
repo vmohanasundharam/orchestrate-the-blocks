@@ -20,6 +20,7 @@ export const BlockConfigModal: React.FC<BlockConfigModalProps> = ({
   node,
   onSave,
 }) => {
+  // Use node-specific config with fallback to empty object
   const [config, setConfig] = useState<Record<string, any>>(node.data?.config || {});
 
   const handleSave = () => {
